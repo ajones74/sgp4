@@ -1,0 +1,8 @@
+--style=allman
+--indent-switches
+--add-brackets
+--pad-paren-in
+--convert-tabs
+--add-one-line-braces
+--indent=spaces=3
+
