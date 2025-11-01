@@ -16,20 +16,22 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
-   Modifications are Copyright (c) 2025 Allan Jones. All rights reserved.
+    Modifications are Copyright (c) 2025 Allan Jones. All rights reserved.
 
 ## Installation
 
    1. Clone the repo: `git clone https://github.com/ajones74/sgp4.git`
    2. Build with CMake, to generate `compile_commands.json` for tagging:
       `cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=on ./CMakeLists.txt`
+   3. Compile everything, and generate the `compile_commands.json` file:
+      `bear -- make -j`
 
 ## Cleaning after a Build
+
    To remove all the CMake build artifacts, including the `build` directory.
    do the following -- it removes ALL files that are not version controlled,
    so be careful.
       `git clean -d -f -x`
-
 
 ## Contributing
 

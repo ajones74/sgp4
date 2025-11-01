@@ -1,1 +1,7 @@
 build/
+compile_commands.json
+.cache/
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
+
