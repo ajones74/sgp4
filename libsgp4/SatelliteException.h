@@ -29,10 +29,10 @@ namespace libsgp4
 class SatelliteException : public std::runtime_error
 {
 public:
-    explicit SatelliteException(const char* message)
-        : runtime_error(message)
-    {
-    }
+   explicit SatelliteException( const char* message )
+      : runtime_error( message )
+   {
+   }
 };
 
 } // namespace libsgp4

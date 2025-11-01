@@ -36,87 +36,87 @@ namespace libsgp4
 struct CoordTopocentric
 {
 public:
-    /**
-     * Default constructor
-     */
-    CoordTopocentric() = default;
+   /**
+    * Default constructor
+    */
+   CoordTopocentric() = default;
 
-    /**
-     * Constructor
-     * @param[in] az azimuth in radians
-     * @param[in] el elevation in radians
-     * @param[in] rnge range in kilometers
-     * @param[in] rnge_rate range rate in kilometers per second
-     */
-    CoordTopocentric(
-            double az,
-            double el,
-            double rnge,
-            double rnge_rate)
-        : azimuth(az)
-        , elevation(el)
-        , range(rnge)
-        , range_rate(rnge_rate)
-    {
-    }
+   /**
+    * Constructor
+    * @param[in] az azimuth in radians
+    * @param[in] el elevation in radians
+    * @param[in] rnge range in kilometers
+    * @param[in] rnge_rate range rate in kilometers per second
+    */
+   CoordTopocentric(
+      double az,
+      double el,
+      double rnge,
+      double rnge_rate )
+      : azimuth( az )
+      , elevation( el )
+      , range( rnge )
+      , range_rate( rnge_rate )
+   {
+   }
 
-    /**
-     * Copy constructor
-     * @param[in] topo object to copy from
-     */
-    CoordTopocentric(const CoordTopocentric& topo)
-    {
-        azimuth = topo.azimuth;
-        elevation = topo.elevation;
-        range = topo.range;
-        range_rate = topo.range_rate;
-    }
+   /**
+    * Copy constructor
+    * @param[in] topo object to copy from
+    */
+   CoordTopocentric( const CoordTopocentric& topo )
+   {
+      azimuth = topo.azimuth;
+      elevation = topo.elevation;
+      range = topo.range;
+      range_rate = topo.range_rate;
+   }
 
-    /**
-     * Assignment operator
-     * @param[in] topo object to copy from
-     */
-    CoordTopocentric& operator=(const CoordTopocentric& topo)
-    {
-        if (this != &topo)
-        {
-            azimuth = topo.azimuth;
-            elevation = topo.elevation;
-            range = topo.range;
-            range_rate = topo.range_rate;
-        }
-        return *this;
-    }
+   /**
+    * Assignment operator
+    * @param[in] topo object to copy from
+    */
+   CoordTopocentric& operator=( const CoordTopocentric& topo )
+   {
+      if ( this != &topo )
+      {
+         azimuth = topo.azimuth;
+         elevation = topo.elevation;
+         range = topo.range;
+         range_rate = topo.range_rate;
+      }
+      return *this;
+   }
 
-    /**
-     * Dump this object to a string
-     * @returns string
-     */
-    std::string ToString() const
-    {
-        std::stringstream ss;
-        ss << std::right << std::fixed << std::setprecision(3);
-        ss << "Az: " << std::setw(8) << Util::RadiansToDegrees(azimuth);
-        ss << ", El: " << std::setw(8) << Util::RadiansToDegrees(elevation);
-        ss << ", Rng: " << std::setw(10) << range;
-        ss << ", Rng Rt: " << std::setw(7) << range_rate;
-        return ss.str();
-    }
+   /**
+    * Dump this object to a string
+    * @returns string
+    */
+   std::string ToString() const
+   {
+      std::stringstream ss;
+      ss << std::right << std::fixed << std::setprecision( 3 );
+      ss << "Az: " << std::setw( 8 ) << Util::RadiansToDegrees( azimuth );
+      ss << ", El: " << std::setw( 8 ) << Util::RadiansToDegrees( elevation );
+      ss << ", Rng: " << std::setw( 10 ) << range;
+      ss << ", Rng Rt: " << std::setw( 7 ) << range_rate;
+      return ss.str();
+   }
 
-    /** azimuth in radians */
-    double azimuth{};
-    /** elevations in radians */
-    double elevation{};
-    /** range in kilometers */
-    double range{};
-    /** range rate in kilometers per second */
-    double range_rate{};
+   /** azimuth in radians */
+   double azimuth{};
+   /** elevations in radians */
+   double elevation{};
+   /** range in kilometers */
+   double range{};
+   /** range rate in kilometers per second */
+   double range_rate{};
 };
 
 
-inline std::ostream& operator<<(std::ostream& strm, const CoordTopocentric& t)
+inline std::ostream& operator<<( std::ostream& strm, const CoordTopocentric& t )
 {
-    return strm << t.ToString();
+   return strm << t.ToString();
 }
 
 } // namespace libsgp4

@@ -29,12 +29,12 @@ namespace libsgp4
 class SolarPosition
 {
 public:
-    SolarPosition() = default;
+   SolarPosition() = default;
 
-    Eci FindPosition(const DateTime& dt);
+   Eci FindPosition( const DateTime& dt );
 
 private:
-    double Delta_ET(double year) const;
+   double Delta_ET( double year ) const;
 };
 
 } // namespace libsgp4

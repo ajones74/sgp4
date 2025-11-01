@@ -31,14 +31,14 @@ namespace libsgp4
 class TleException : public std::runtime_error
 {
 public:
-    /**
-     * Constructor
-     * @param message Exception message
-     */
-    explicit TleException(const char* message)
-        : runtime_error(message)
-    {
-    }
+   /**
+    * Constructor
+    * @param message Exception message
+    */
+   explicit TleException( const char* message )
+      : runtime_error( message )
+   {
+   }
 };
 
 } // namespace libsgp4

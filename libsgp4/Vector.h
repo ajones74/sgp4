@@ -34,127 +34,127 @@ struct Vector
 {
 public:
 
-    /**
-     * Default constructor
-     */
-    Vector() = default;
+   /**
+    * Default constructor
+    */
+   Vector() = default;
 
-    /**
-     * Constructor
-     * @param arg_x x value
-     * @param arg_y y value
-     * @param arg_z z value
-     */
-    Vector(const double arg_x,
-            const double arg_y,
-            const double arg_z)
-        : x(arg_x), y(arg_y), z(arg_z)
-    {
-    }
+   /**
+    * Constructor
+    * @param arg_x x value
+    * @param arg_y y value
+    * @param arg_z z value
+    */
+   Vector( const double arg_x,
+           const double arg_y,
+           const double arg_z )
+      : x( arg_x ), y( arg_y ), z( arg_z )
+   {
+   }
 
-    /**
-     * Constructor
-     * @param arg_x x value
-     * @param arg_y y value
-     * @param arg_z z value
-     * @param arg_w w value
-     */
-    Vector(const double arg_x,
-            const double arg_y,
-            const double arg_z,
-            const double arg_w)
-        : x(arg_x), y(arg_y), z(arg_z), w(arg_w)
-    {
-    }
+   /**
+    * Constructor
+    * @param arg_x x value
+    * @param arg_y y value
+    * @param arg_z z value
+    * @param arg_w w value
+    */
+   Vector( const double arg_x,
+           const double arg_y,
+           const double arg_z,
+           const double arg_w )
+      : x( arg_x ), y( arg_y ), z( arg_z ), w( arg_w )
+   {
+   }
 
-    /**
-     * Copy constructor
-     * @param v value to copy from
-     */
-    Vector(const Vector& v)
-    {
-        x = v.x;
-        y = v.y;
-        z = v.z;
-        w = v.w;
-    }
+   /**
+    * Copy constructor
+    * @param v value to copy from
+    */
+   Vector( const Vector& v )
+   {
+      x = v.x;
+      y = v.y;
+      z = v.z;
+      w = v.w;
+   }
 
-    /**
-     * Assignment operator
-     * @param v value to copy from
-     */
-    Vector& operator=(const Vector& v)
-    {
-        if (this != &v)
-        {
-            x = v.x;
-            y = v.y;
-            z = v.z;
-            w = v.w;
-        }
-        return *this;
-    }
+   /**
+    * Assignment operator
+    * @param v value to copy from
+    */
+   Vector& operator=( const Vector& v )
+   {
+      if ( this != &v )
+      {
+         x = v.x;
+         y = v.y;
+         z = v.z;
+         w = v.w;
+      }
+      return *this;
+   }
 
-    /**
-     * Subtract operator
-     * @param v value to suctract from
-     */
-    Vector operator-(const Vector& v)
-    {
-        return Vector(x - v.x,
-                y - v.y,
-                z - v.z,
-                0.0);
-    }
+   /**
+    * Subtract operator
+    * @param v value to suctract from
+    */
+   Vector operator-( const Vector& v )
+   {
+      return Vector( x - v.x,
+                     y - v.y,
+                     z - v.z,
+                     0.0 );
+   }
 
-    /**
-     * Calculates the magnitude of the vector
-     * @returns magnitude of the vector
-     */
-    double Magnitude() const
-    {
-        return sqrt(x * x + y * y + z * z);
-    }
+   /**
+    * Calculates the magnitude of the vector
+    * @returns magnitude of the vector
+    */
+   double Magnitude() const
+   {
+      return sqrt( x * x + y * y + z * z );
+   }
 
-    /**
-     * Calculates the dot product
-     * @returns dot product
-     */
-    double Dot(const Vector& vec) const
-    {
-        return (x * vec.x) +
-            (y * vec.y) +
-            (z * vec.z);
-    }
+   /**
+    * Calculates the dot product
+    * @returns dot product
+    */
+   double Dot( const Vector& vec ) const
+   {
+      return ( x * vec.x ) +
+             ( y * vec.y ) +
+             ( z * vec.z );
+   }
 
-    /**
-     * Converts this vector to a string
-     * @returns this vector as a string
-     */
-    std::string ToString() const
-    {
-        std::stringstream ss;
-        ss << std::right << std::fixed << std::setprecision(3);
-        ss << "X: " << std::setw(9) << x;
-        ss << ", Y: " << std::setw(9) << y;
-        ss << ", Z: " << std::setw(9) << z;
-        ss << ", W: " << std::setw(9) << w;
-        return ss.str();
-    }
+   /**
+    * Converts this vector to a string
+    * @returns this vector as a string
+    */
+   std::string ToString() const
+   {
+      std::stringstream ss;
+      ss << std::right << std::fixed << std::setprecision( 3 );
+      ss << "X: " << std::setw( 9 ) << x;
+      ss << ", Y: " << std::setw( 9 ) << y;
+      ss << ", Z: " << std::setw( 9 ) << z;
+      ss << ", W: " << std::setw( 9 ) << w;
+      return ss.str();
+   }
 
-    /** x value */
-    double x{};
-    /** y value */
-    double y{};
-    /** z value */
-    double z{};
-    /** w value */
-    double w{};
+   /** x value */
+   double x{};
+   /** y value */
+   double y{};
+   /** z value */
+   double z{};
+   /** w value */
+   double w{};
 };
 
-inline std::ostream& operator<<(std::ostream& strm, const Vector& v)
+inline std::ostream& operator<<( std::ostream& strm, const Vector& v )
 {
-    return strm << v.ToString();
+   return strm << v.ToString();
 }
 
 } // namespace libsgp4

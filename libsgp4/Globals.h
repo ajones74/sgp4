@@ -39,7 +39,7 @@ const double kXJ4 = -1.65597e-6;
  * dundee
  * const double kXKE = 7.43669161331734132e-2;
  */
-const double kXKE = 60.0 / sqrt(kXKMPER * kXKMPER * kXKMPER / kMU);
+const double kXKE = 60.0 / sqrt( kXKMPER * kXKMPER * kXKMPER / kMU );
 const double kCK2 = 0.5 * kXJ2 * kAE * kAE;
 const double kCK4 = -0.375 * kXJ4 * kAE * kAE * kAE * kAE;
 
@@ -51,9 +51,9 @@ const double kCK4 = -0.375 * kXJ4 * kAE * kAE * kAE * kAE;
  * dundee
  * #define QOMS2T   (1.880279159015270643865e-9)
  */
-const double kQOMS2T = pow(((kQ0 - kS0) / kXKMPER), 4.0);
+const double kQOMS2T = pow( ( ( kQ0 - kS0 ) / kXKMPER ), 4.0 );
 
-const double kS = kAE * (1.0 + kS0 / kXKMPER);
+const double kS = kAE * ( 1.0 + kS0 / kXKMPER );
 const double kPI = 3.14159265358979323846264338327950288419716939937510582;
 const double kTWOPI = 2.0 * kPI;
 const double kTWOTHIRD = 2.0 / 3.0;

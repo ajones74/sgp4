@@ -32,48 +32,48 @@ namespace libsgp4
 class DecayedException : public std::runtime_error
 {
 public:
-    /**
-     * Constructor
-     * @param[in] dt time of the event
-     * @param[in] pos position of the satellite at dt
-     * @param[in] vel velocity of the satellite at dt
-     */
-    DecayedException(const DateTime& dt, const Vector& pos, const Vector& vel)
-        : runtime_error("Satellite decayed")
-        , _dt(dt)
-        , _pos(pos)
-        , _vel(vel)
-    {
-    }
+   /**
+    * Constructor
+    * @param[in] dt time of the event
+    * @param[in] pos position of the satellite at dt
+    * @param[in] vel velocity of the satellite at dt
+    */
+   DecayedException( const DateTime& dt, const Vector& pos, const Vector& vel )
+      : runtime_error( "Satellite decayed" )
+      , _dt( dt )
+      , _pos( pos )
+      , _vel( vel )
+   {
+   }
 
-    /**
-     * @returns the date
-     */
-    DateTime Decayed() const
-    {
-        return _dt;
-    }
+   /**
+    * @returns the date
+    */
+   DateTime Decayed() const
+   {
+      return _dt;
+   }
 
-    /**
-     * @returns the position
-     */
-    Vector Position() const
-    {
-        return _pos;
-    }
+   /**
+    * @returns the position
+    */
+   Vector Position() const
+   {
+      return _pos;
+   }
 
-    /**
-     * @returns the velocity
-     */
-    Vector Velocity() const
-    {
-        return _vel;
-    }
+   /**
+    * @returns the velocity
+    */
+   Vector Velocity() const
+   {
+      return _vel;
+   }
 
 private:
-    DateTime _dt;
-    Vector _pos;
-    Vector _vel;
+   DateTime _dt;
+   Vector _pos;
+   Vector _vel;
 };
 
 } // namespace libsgp4
