@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-
 #pragma once
 
-#include "Tle.h"
-#include "OrbitalElements.h"
-#include "Eci.h"
-#include "SatelliteException.h"
 #include "DecayedException.h"
+#include "Eci.h"
+#include "OrbitalElements.h"
+#include "SatelliteException.h"
+#include "Tle.h"
 
 namespace libsgp4
 {
@@ -33,20 +32,16 @@ namespace libsgp4
  */
 
 /**
- * @brief The simplified perturbations model 4 propagater.
+ * @brief The simplified perturbations model 4 propagator.
  */
 class SGP4
 {
 public:
-   explicit SGP4( const Tle& tle )
-      : elements_( tle )
-   {
-      Initialise();
-   }
+   explicit SGP4( const Tle &tle ) : elements_( tle ) { Initialise(); }
 
-   void SetTle( const Tle& tle );
+   void SetTle( const Tle &tle );
    Eci FindPosition( double tsince ) const;
-   Eci FindPosition( const DateTime& date ) const;
+   Eci FindPosition( const DateTime &date ) const;
 
 private:
    struct CommonConstants
@@ -148,12 +143,7 @@ private:
       double xfact;
       double xlamo;
 
-      enum TOrbitShape
-      {
-         NONE,
-         RESONANCE,
-         SYNCHRONOUS
-      } shape;
+      enum TOrbitShape { NONE, RESONANCE, SYNCHRONOUS } shape;
    };
 
    struct IntegratorParams
@@ -167,70 +157,42 @@ private:
    };
 
    void Initialise();
-   static void RecomputeConstants( const double xinc,
-                                   double& sinio,
-                                   double& cosio,
-                                   double& x3thm1,
-                                   double& x1mth2,
-                                   double& x7thm1,
-                                   double& xlcof,
-                                   double& aycof );
+   static void RecomputeConstants( const double xinc, double &sinio,
+                                   double &cosio, double &x3thm1, double &x1mth2,
+                                   double &x7thm1, double &xlcof, double &aycof );
    Eci FindPositionSDP4( const double tsince ) const;
    Eci FindPositionSGP4( double tsince ) const;
    static Eci CalculateFinalPositionVelocity(
-      const DateTime& date,
-      const double e,
-      const double a,
-      const double omega,
-      const double xl,
-      const double xnode,
-      const double xinc,
-      const double xlcof,
-      const double aycof,
-      const double x3thm1,
-      const double x1mth2,
-      const double x7thm1,
-      const double cosio,
+      const DateTime &date, const double e, const double a, const double omega,
+      const double xl, const double xnode, const double xinc,
+      const double xlcof, const double aycof, const double x3thm1,
+      const double x1mth2, const double x7thm1, const double cosio,
       const double sinio );
    /**
     * Deep space initialisation
     */
-   void DeepSpaceInitialise(
-      const double eosq,
-      const double sinio,
-      const double cosio,
-      const double betao,
-      const double theta2,
-      const double betao2,
-      const double xmdot,
-      const double omgdot,
-      const double xnodot );
+   void DeepSpaceInitialise( const double eosq, const double sinio,
+                             const double cosio, const double betao,
+                             const double theta2, const double betao2,
+                             const double xmdot, const double omgdot,
+                             const double xnodot );
    /**
     * Calculate lunar / solar periodics and apply
     */
-   static void DeepSpacePeriodics(
-      const double tsince,
-      const DeepSpaceConstants& ds_constants,
-      double& em,
-      double& xinc,
-      double& omgasm,
-      double& xnodes,
-      double& xll );
+   static void DeepSpacePeriodics( const double tsince,
+                                   const DeepSpaceConstants &ds_constants,
+                                   double &em, double &xinc, double &omgasm,
+                                   double &xnodes, double &xll );
    /**
     * Deep space secular effects
     */
-   static void DeepSpaceSecular(
-      const double tsince,
-      const OrbitalElements& elements,
-      const CommonConstants& c_constants,
-      const DeepSpaceConstants& ds_constants,
-      IntegratorParams& integ_params,
-      double& xll,
-      double& omgasm,
-      double& xnodes,
-      double& em,
-      double& xinc,
-      double& xn );
+   static void DeepSpaceSecular( const double tsince,
+                                 const OrbitalElements &elements,
+                                 const CommonConstants &c_constants,
+                                 const DeepSpaceConstants &ds_constants,
+                                 IntegratorParams &integ_params, double &xll,
+                                 double &omgasm, double &xnodes, double &em,
+                                 double &xinc, double &xn );
 
    /**
     * Reset

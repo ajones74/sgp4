@@ -14,42 +14,55 @@
  * limitations under the License.
  */
 
-
-#include <CoordTopocentric.h>
+#include "DateTime.h"
+#include "TimeSpan.h"
 #include <CoordGeodetic.h>
+#include <CoordTopocentric.h>
 #include <Observer.h>
 #include <SGP4.h>
 
 #include <iostream>
 
-int main()
-{
-   libsgp4::Observer obs( 51.507406923983446, -0.12773752212524414, 0.05 );
-   libsgp4::Tle tle = libsgp4::Tle( "UK-DMC 2                ",
-                                    "1 35683U 09041C   12289.23158813  .00000484  00000-0  89219-4 0  5863",
-                                    "2 35683  98.0221 185.3682 0001499 100.5295 259.6088 14.69819587172294" );
-   libsgp4::SGP4 sgp4( tle );
+int main() {
+  // lat/lon/altitude of PIE airport.
+  libsgp4::Observer obs(27.9086, -82.6865, 3.0);
 
-   std::cout << tle << std::endl;
+  libsgp4::Tle tle = libsgp4::Tle(
+      "O3B MPOWER F9",
+      "1 64866U 25153A   25281.47605596 -.00000005  00000+0  00000+0 0  9990",
+      "2 64866   3.2383 359.8473 0761196 355.0351   4.2328  5.89130413  5392");
+  libsgp4::SGP4 sgp4(tle);
 
-   for ( int i = 0; i < 10; ++i )
-   {
-      libsgp4::DateTime dt = tle.Epoch().AddMinutes( i * 10 );
-      /*
-       * calculate satellite position
-       */
-      libsgp4::Eci eci = sgp4.FindPosition( dt );
-      /*
-       * get look angle for observer to satellite
-       */
-      libsgp4::CoordTopocentric topo = obs.GetLookAngle( eci );
-      /*
-       * convert satellite position to geodetic coordinates
-       */
-      libsgp4::CoordGeodetic geo = eci.ToGeodetic();
+  std::cout << tle << std::endl;
 
-      std::cout << dt << " " << topo << " " << geo << std::endl;
-   };
+  libsgp4::DateTime now = libsgp4::DateTime::Now();
+  libsgp4::DateTime epoch = tle.Epoch();
+  libsgp4::TimeSpan tsince = now - epoch;
 
-   return 0;
+  double tsince_d = tsince.TotalMinutes();
+
+  std::cout << "Minutes since TLE Epoch:(" << tsince_d << ")" << std::endl;
+
+  std::cout << "epoch(" << epoch << ")" << std::endl;
+  std::cout << "now(" << now << ")" << std::endl;
+
+  for (int i = 0; i < 10; ++i) {
+    libsgp4::DateTime dt = tle.Epoch().AddMinutes((int)tsince_d + (i * 10));
+    /*
+     * calculate satellite position
+     */
+    libsgp4::Eci eci = sgp4.FindPosition(dt);
+    /*
+     * get look angle for observer to satellite
+     */
+    libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
+    /*
+     * convert satellite position to geodetic coordinates
+     */
+    libsgp4::CoordGeodetic geo = eci.ToGeodetic();
+
+    std::cout << dt << " " << topo << " " << geo << std::endl;
+  };
+
+  return 0;
 }
