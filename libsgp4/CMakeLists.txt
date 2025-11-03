@@ -1,14 +1,8 @@
 set(SRCS
-    CoordGeodetic.cc
-    CoordTopocentric.cc
-    DateTime.cc
-    DecayedException.cc
     Eci.cc
-    Globals.cc
     Observer.cc
     OrbitalElements.cc
     SGP4.cc
-    SatelliteException.cc
     SolarPosition.cc
     TimeSpan.cc
     Tle.cc
