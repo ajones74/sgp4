@@ -27,8 +27,9 @@ static size_t fetch_tle_data(const std::string &tle_filename,
     tle_data.push_back(line);
     found_craft_count++;
   }
+  // divide-by-3 as each craft (better have!) three lines of
+  // details in the TLE file.
   found_craft_count = found_craft_count / 3;
-  std::cout << "FOUND (" << found_craft_count << ") craft..." << std::endl;
 
   infile.close();
   return found_craft_count;
