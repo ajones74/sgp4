@@ -55,11 +55,11 @@ double FindMaxElevation(const libsgp4::CoordGeodetic &user_geo,
       libsgp4::Eci eci = sgp4.FindPosition(current_time);
       libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
 
-      if (topo.elevation > max_elevation) {
+      if (topo.m_elevation > max_elevation) {
         /*
          * still going up
          */
-        max_elevation = topo.elevation;
+        max_elevation = topo.m_elevation;
         /*
          * move time along
          */
@@ -123,7 +123,7 @@ libsgp4::DateTime FindCrossingPoint(const libsgp4::CoordGeodetic &user_geo,
     libsgp4::Eci eci = sgp4.FindPosition(middle_time);
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
 
-    if (topo.elevation > 0.0) {
+    if (topo.m_elevation > 0.0) {
       /*
        * satellite above horizon
        */
@@ -165,7 +165,7 @@ libsgp4::DateTime FindCrossingPoint(const libsgp4::CoordGeodetic &user_geo,
   while (running && cnt++ < 6) {
     libsgp4::Eci eci = sgp4.FindPosition(middle_time);
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
-    if (topo.elevation > 0) {
+    if (topo.m_elevation > 0) {
       middle_time = middle_time.AddSeconds(finding_aos ? -1 : 1);
     } else {
       running = false;
@@ -200,7 +200,7 @@ GeneratePassList(const libsgp4::CoordGeodetic &user_geo, libsgp4::SGP4 &sgp4,
     libsgp4::Eci eci = sgp4.FindPosition(current_time);
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
 
-    if (!found_aos && topo.elevation > 0.0) {
+    if (!found_aos && topo.m_elevation > 0.0) {
       /*
        * aos hasnt occured yet, but the satellite is now above horizon
        * this must have occured within the last time_step
@@ -219,7 +219,7 @@ GeneratePassList(const libsgp4::CoordGeodetic &user_geo, libsgp4::SGP4 &sgp4,
                                      current_time, true);
       }
       found_aos = true;
-    } else if (found_aos && topo.elevation < 0.0) {
+    } else if (found_aos && topo.m_elevation < 0.0) {
       found_aos = false;
       /*
        * end of pass, so move along more than time_step
