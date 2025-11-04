@@ -36,18 +36,8 @@ static size_t fetch_tle_data(const std::string &tle_filename,
   return found_craft_count;
 }
 
-static bool fetch_tle_triplet(int index,
-                              std::array<std::string, 3> &tle_triplet,
-                              const std::vector<std::string> &tle_data) {
-
-  tle_triplet[0] = tle_data.at(index * 3);
-  tle_triplet[1] = tle_data.at((index * 3) + 1);
-  tle_triplet[2] = tle_data.at((index * 3) + 2);
-
-  return true;
-}
-
 int main() {
+
   // lat/lon/altitude of PIE airport.
   libsgp4::Observer obs(27.9086, -82.6865, 3.0);
 
@@ -59,13 +49,15 @@ int main() {
   std::cout << "Found (" << craft_count << ") craft in the TLE file..."
             << std::endl;
 
-  std::array<std::string, 3> tle_triplet;
+  std::vector<std::string> discovered_craft;
   int index{0};
-  while (craft_count-- && fetch_tle_triplet(index++, tle_triplet, tle_data)) {
-    std::string craft_name{tle_triplet[0]};
+  int discovered_craft_count{0};
+  while (craft_count--) {
+    std::string craft_name{tle_data.at(index * 3)};
 
     libsgp4::Tle tle =
-        libsgp4::Tle(tle_triplet[0], tle_triplet[1], tle_triplet[2]);
+        libsgp4::Tle(tle_data.at(index * 3), tle_data.at((index * 3) + 1),
+                     tle_data.at((index * 3) + 2));
 
     libsgp4::SGP4 sgp4(tle);
 
@@ -96,7 +88,19 @@ int main() {
     if (topo.elevation() > 10.00) {
       std::cout << craft_name << " is ABOVE HORIZON: AZ(" << topo.azimuth()
                 << "), EL(" << topo.elevation() << ")" << std::endl;
+
+      discovered_craft.push_back(tle_data.at((index * 3)));
+      discovered_craft.push_back(tle_data.at((index * 3) + 1));
+      discovered_craft.push_back(tle_data.at((index * 3) + 2));
+      discovered_craft_count++;
     }
+    index++;
   }
+
+  if (discovered_craft_count == 0) {
+    std::cout << "NO craft found visible above the horizon...";
+    return 0;
+  }
+
   return 0;
 }
