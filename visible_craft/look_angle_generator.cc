@@ -27,8 +27,10 @@ static size_t fetch_tle_data(const std::string &tle_filename,
     tle_data.push_back(line);
     found_craft_count++;
   }
+  // divide by three as three lines of text define each craft in a TLE file...
+  // (Three-Line-Element? I know, it's referred to as a TWO Line Element
+  // file...)
   found_craft_count = found_craft_count / 3;
-  std::cout << "FOUND (" << found_craft_count << ") craft..." << std::endl;
 
   infile.close();
   return found_craft_count;
@@ -74,11 +76,8 @@ int main() {
     libsgp4::DateTime epoch = tle.Epoch();
     libsgp4::TimeSpan tsince = now - epoch;
 
-    double tsince_d = tsince.TotalMinutes();
-    libsgp4::DateTime dt = tle.Epoch().AddMinutes((int)tsince_d);
-    // std::cout << "Minutes since TLE Epoch:(" << tsince_d << ")" << std::endl;
-    // std::cout << "epoch(" << epoch << ")" << std::endl;
-    // std::cout << "now(" << now << ")" << std::endl;
+    double tsince_d = tsince.TotalSeconds();
+    libsgp4::DateTime dt = tle.Epoch().AddSeconds((int)tsince_d);
 
     /*
      * calculate satellite position

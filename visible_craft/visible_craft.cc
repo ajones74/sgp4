@@ -67,7 +67,6 @@ int main() {
         libsgp4::Tle(tle_triplet[0], tle_triplet[1], tle_triplet[2]);
 
     libsgp4::SGP4 sgp4(tle);
-
     // std::cout << tle << std::endl;
 
     // The current time, in UTC reference
@@ -75,11 +74,8 @@ int main() {
     libsgp4::DateTime epoch = tle.Epoch();
     libsgp4::TimeSpan tsince = now - epoch;
 
-    double tsince_d = tsince.TotalMinutes();
-    libsgp4::DateTime dt = tle.Epoch().AddMinutes((int)tsince_d);
-    // std::cout << "Minutes since TLE Epoch:(" << tsince_d << ")" << std::endl;
-    // std::cout << "epoch(" << epoch << ")" << std::endl;
-    // std::cout << "now(" << now << ")" << std::endl;
+    double tsince_d = tsince.TotalSeconds();
+    libsgp4::DateTime dt = tle.Epoch().AddSeconds((int)tsince_d);
 
     /*
      * calculate satellite position
@@ -89,12 +85,7 @@ int main() {
      * get look angle for observer to satellite
      */
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
-    /*
-     * convert satellite position to geodetic coordinates
-     */
-    libsgp4::CoordGeodetic geo = eci.ToGeodetic();
 
-    // std::cout << topo << " " << geo << std::endl;
     if (topo.elevation() > 10.00) {
       std::cout << craft_name << " is ABOVE HORIZON: AZ(" << topo.azimuth()
                 << "), EL(" << topo.elevation() << ")" << std::endl;

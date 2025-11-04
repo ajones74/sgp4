@@ -25,8 +25,8 @@
 #include <list>
 
 struct PassDetails {
-  libsgp4::DateTime aos;
-  libsgp4::DateTime los;
+  libsgp4::DateTime aos; // acquisition of signal
+  libsgp4::DateTime los; // loss of signal
   double max_elevation;
 };
 
