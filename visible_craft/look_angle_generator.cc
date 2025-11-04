@@ -55,32 +55,20 @@ generate_track_data(const std::vector<std::string> &discovered_craft,
   double tsince_d = tsince.TotalSeconds();
   libsgp4::DateTime dt = tle.Epoch().AddSeconds((int)tsince_d);
 
-  /*
-   * calculate satellite position
-   */
-  libsgp4::Eci eci = sgp4.FindPosition(dt);
-  /*
-   * get look angle for observer to satellite
-   */
-  libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
-
-  while (topo.elevation() > 10.00) {
-    libsgp4::Observer obs(observer_GPS);
-    libsgp4::Tle tle = libsgp4::Tle(discovered_craft.at(index * 3),
-                                    discovered_craft.at((index * 3) + 1),
-                                    discovered_craft.at((index * 3) + 2));
-
-    libsgp4::SGP4 sgp4(tle);
-
+  std::cout << "CRAFT: (" << tle.Name() << ")." << std::endl;
+  double elevation{0.0};
+  do {
     libsgp4::Eci eci = sgp4.FindPosition(dt);
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
 
-    std::cout << "AZ(" << topo.azimuth() << "), EL(" << topo.elevation()
-              << "), range(" << topo.range() << "), range-rate("
-              << topo.range_rate() << ")" << std::endl;
+    std::cout << topo.azimuth() << "," << topo.elevation() << ","
+              << topo.range() << "," << topo.range_rate() << std::endl;
 
     dt = dt.AddSeconds(1);
-  }
+    elevation = topo.elevation();
+  } while (elevation > 10.0);
+
+  std::cout << "DONE!" << std::endl << std::endl;
 }
 
 int main() {
@@ -108,7 +96,6 @@ int main() {
                      tle_data.at((index * 3) + 2));
 
     libsgp4::SGP4 sgp4(tle);
-
     // std::cout << tle << std::endl;
 
     // The current time, in UTC reference
