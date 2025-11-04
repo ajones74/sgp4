@@ -36,10 +36,58 @@ static size_t fetch_tle_data(const std::string &tle_filename,
   return found_craft_count;
 }
 
+static void
+generate_track_data(const std::vector<std::string> &discovered_craft,
+                    const libsgp4::CoordGeodetic &observer_GPS, int index) {
+
+  libsgp4::Observer obs(observer_GPS);
+  libsgp4::Tle tle = libsgp4::Tle(discovered_craft.at(index * 3),
+                                  discovered_craft.at((index * 3) + 1),
+                                  discovered_craft.at((index * 3) + 2));
+
+  libsgp4::SGP4 sgp4(tle);
+
+  // The current time, in UTC reference
+  libsgp4::DateTime now = libsgp4::DateTime::Now();
+  libsgp4::DateTime epoch = tle.Epoch();
+  libsgp4::TimeSpan tsince = now - epoch;
+
+  double tsince_d = tsince.TotalSeconds();
+  libsgp4::DateTime dt = tle.Epoch().AddSeconds((int)tsince_d);
+
+  /*
+   * calculate satellite position
+   */
+  libsgp4::Eci eci = sgp4.FindPosition(dt);
+  /*
+   * get look angle for observer to satellite
+   */
+  libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
+
+  while (topo.elevation() > 10.00) {
+    libsgp4::Observer obs(observer_GPS);
+    libsgp4::Tle tle = libsgp4::Tle(discovered_craft.at(index * 3),
+                                    discovered_craft.at((index * 3) + 1),
+                                    discovered_craft.at((index * 3) + 2));
+
+    libsgp4::SGP4 sgp4(tle);
+
+    libsgp4::Eci eci = sgp4.FindPosition(dt);
+    libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
+
+    std::cout << "AZ(" << topo.azimuth() << "), EL(" << topo.elevation()
+              << "), range(" << topo.range() << "), range-rate("
+              << topo.range_rate() << ")" << std::endl;
+
+    dt = dt.AddSeconds(1);
+  }
+}
+
 int main() {
 
   // lat/lon/altitude of PIE airport.
-  libsgp4::Observer obs(27.9086, -82.6865, 3.0);
+  libsgp4::CoordGeodetic observer_GPS(27.9086, -82.6865, 3.0);
+  libsgp4::Observer obs(observer_GPS);
 
   std::vector<std::string> tle_data{};
   size_t craft_count = fetch_tle_data("mPOWER.tle", tle_data);
@@ -79,12 +127,7 @@ int main() {
      * get look angle for observer to satellite
      */
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
-    /*
-     * convert satellite position to geodetic coordinates
-     */
-    libsgp4::CoordGeodetic geo = eci.ToGeodetic();
 
-    // std::cout << topo << " " << geo << std::endl;
     if (topo.elevation() > 10.00) {
       std::cout << craft_name << " is ABOVE HORIZON: AZ(" << topo.azimuth()
                 << "), EL(" << topo.elevation() << ")" << std::endl;
@@ -100,6 +143,12 @@ int main() {
   if (discovered_craft_count == 0) {
     std::cout << "NO craft found visible above the horizon...";
     return 0;
+  }
+  std::cout << "Discovered craft count:(" << discovered_craft_count << ")"
+            << std::endl;
+
+  for (int d = 0; d < discovered_craft_count; ++d) {
+    generate_track_data(discovered_craft, observer_GPS, d);
   }
 
   return 0;
