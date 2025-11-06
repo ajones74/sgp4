@@ -11,6 +11,14 @@
 #include <SGP4.h>
 #include <TimeSpan.h>
 
+struct look_angle_data_t {
+  uint64_t m_current_tick;
+  double m_az;
+  double m_el;
+  double m_range;
+  double m_range_rate;
+};
+
 static size_t fetch_tle_data(const std::string &tle_filename,
                              std::vector<std::string> &tle_data) {
 
@@ -57,16 +65,42 @@ generate_track_data(const std::vector<std::string> &discovered_craft,
 
   std::cout << "CRAFT: (" << tle.Name() << ")." << std::endl;
   double elevation{0.0};
+
+  std::vector<look_angle_data_t> look_angle_data;
   do {
     libsgp4::Eci eci = sgp4.FindPosition(dt);
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
 
-    std::cout << topo.azimuth() << "," << topo.elevation() << ","
-              << topo.range() << "," << topo.range_rate() << std::endl;
+    // std::cout << dt.ToString() << "," << topo.azimuth() << ","
+    //           << topo.elevation() << "," << topo.range() << ","
+    //          << topo.elevation() << "," << topo.range() << ","
+    //          << topo.range_rate() << std::endl;
 
     dt = dt.AddSeconds(1);
+    // "Ticks" are in microsceconds of time...
+    uint64_t current_tick = dt.Ticks();
+    look_angle_data_t t{current_tick, topo.azimuth(), topo.elevation(),
+                        topo.range(), topo.range_rate()};
+
+    look_angle_data.push_back(std::move(t));
+
     elevation = topo.elevation();
   } while (elevation > 10.0);
+
+  std::string ofilename{tle.Name()};
+
+  std::replace(ofilename.begin(), ofilename.end(), ' ', '_');
+
+  std::ofstream ofs(ofilename);
+  if (!ofs) {
+    std::cout << "CANNOT OPEN OUTPUT FILE.";
+    return;
+  }
+
+  for (const auto &it : look_angle_data) {
+    ofs << it.m_current_tick << "," << it.m_az << "," << it.m_el << ","
+        << it.m_range << "," << it.m_range_rate << "\n";
+  }
 
   std::cout << "DONE!" << std::endl << std::endl;
 }
