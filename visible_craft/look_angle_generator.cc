@@ -55,7 +55,7 @@ generate_track_data(const std::vector<std::string> &discovered_craft,
 
   libsgp4::SGP4 sgp4(tle);
 
-  // The current time, in UTC reference
+  // The current time, in UTC reference time
   libsgp4::DateTime now = libsgp4::DateTime::Now();
   libsgp4::DateTime epoch = tle.Epoch();
   libsgp4::TimeSpan tsince = now - epoch;
@@ -70,13 +70,8 @@ generate_track_data(const std::vector<std::string> &discovered_craft,
   do {
     libsgp4::Eci eci = sgp4.FindPosition(dt);
     libsgp4::CoordTopocentric topo = obs.GetLookAngle(eci);
-
-    // std::cout << dt.ToString() << "," << topo.azimuth() << ","
-    //           << topo.elevation() << "," << topo.range() << ","
-    //          << topo.elevation() << "," << topo.range() << ","
-    //          << topo.range_rate() << std::endl;
-
     dt = dt.AddSeconds(1);
+
     // "Ticks" are in microsceconds of time...
     uint64_t current_tick = dt.Ticks();
     look_angle_data_t t{current_tick, topo.azimuth(), topo.elevation(),
@@ -98,7 +93,12 @@ generate_track_data(const std::vector<std::string> &discovered_craft,
   }
 
   for (const auto &it : look_angle_data) {
-    ofs << it.m_current_tick << "," << it.m_az << "," << it.m_el << ","
+    int64_t corrected_time = it.m_current_tick - libsgp4::UnixEpoch;
+    int64_t microsecond_adjustment = corrected_time % 1000000;
+    corrected_time -= microsecond_adjustment;
+    corrected_time /= 1000000;
+
+    ofs << corrected_time << "," << it.m_az << "," << it.m_el << ","
         << it.m_range << "," << it.m_range_rate << "\n";
   }
 
