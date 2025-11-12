@@ -92,12 +92,16 @@ generate_track_data(const std::vector<std::string> &discovered_craft,
     return;
   }
 
+  bool first_pass{true};
+  int64_t microsecond_adjustment{0};
   for (const auto &it : look_angle_data) {
     int64_t corrected_time = it.m_current_tick - libsgp4::UnixEpoch;
-    int64_t microsecond_adjustment = corrected_time % 1000000;
+    if (first_pass) {
+      microsecond_adjustment = corrected_time % 1000000;
+      first_pass = false;
+    }
     corrected_time -= microsecond_adjustment;
     corrected_time /= 1000000;
-
     ofs << corrected_time << "," << it.m_az << "," << it.m_el << ","
         << it.m_range << "," << it.m_range_rate << "\n";
   }

@@ -34,5 +34,4 @@ def plot_polar_from_csv(filename):
     ax.set_ylim(0, 90)  # Horizon at edge, zenith at 0
     plt.show()
 
-# Example usage: replace 'data.csv' with your file path
-plot_polar_from_csv('O3B_MPOWER_F7')
+plot_polar_from_csv('O3B_MPOWER_F1')

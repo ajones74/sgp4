@@ -5,29 +5,35 @@ import matplotlib.pyplot as plt
 def plot_azimuth_from_csv(filename):
     time = []
     azimuth = []
+    elevation = []
 
     with open(filename, mode='r') as file:
         reader = csv.reader(file)
-        # Skip header if present (assume first row is data; uncomment and adjust if there's a header)
-        # next(reader)  # Skip header row
 
         for row in reader:
             if len(row) >= 2:  # Ensure at least two fields
-                time.append((float(row[0]) / 1_000_000) - 6213559680 )  # First field: time (convert to float)
-                azimuth.append(float(row[2]))  # Second field: elevation (convert to float)
+                time.append(float(row[0]))  # First field: time (convert to float)
+                azimuth.append(float(row[1]))  # second field: azimuth (convert to float)
+                elevation.append(float(row[2]))  # third field: elevation (convert to float)
 
     if not time:
         print("No data found in CSV.")
         return
 
     # Plot the data
-    plt.figure(figsize=(10, 6))
-    plt.plot(time, azimuth, marker='o', linestyle='-', color='b')
-    plt.title('Azimuth vs Time')
-    plt.xlabel('Time (seconds)')  # Adjust label if time unit differs
-    plt.ylabel('Azimuth (degrees)')  # Adjust if units differ
+    #plt.figure(figsize=(20, 10))
+    fig = plt.figure( )
+    #plt.title('Azimuth, Elevation, vs Time')
+    ax1 = fig.add_subplot()
+    ax1.plot(time, azimuth, marker='o', linestyle='-', color='b')
+    ax1.set_ylabel('Azimuth (degrees)', color='b')
+    ax1.set_xlabel('Time (seconds)')
+ 
+    ax2 = ax1.twinx()
+    ax2.plot(time, elevation, marker='o', linestyle='-', color='r')
+    #fig.set_xlabel('Time (seconds)')  # Adjust label if time unit differs
+    ax2.set_ylabel('Elevation (degrees)', color='r')  # Adjust if units differ
     plt.grid(True)
     plt.show()
 
-# Example usage: replace 'data.csv' with your file path
-plot_azimuth_from_csv('O3B_MPOWER_F6')
+plot_azimuth_from_csv('O3B_MPOWER_F1')
