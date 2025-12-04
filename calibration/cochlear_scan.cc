@@ -1,4 +1,5 @@
 #include <cmath>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -11,19 +12,22 @@ struct Point2D {
   double el_offset_deg; // elevation offset from nominal (degrees)
 };
 
+struct CochlearScannerConfig {
+  double start_radius_deg =
+      4.0; // initial search radius (±4 degrees is safe for Ka-band)
+  double min_radius_deg =
+      0.12; // stop when inside ~1/5 of typical 0.7 degrees beam
+  double arc_step_deg = 0.15;   // constant arc length between points
+  double dwell_time_sec = 0.18; // time to wait at each point for RSSI to settle
+};
+
 class CochlearScanner {
 public:
-  struct Config {
-    double start_radius_deg =
-        4.0; // initial search radius (±4 degrees is safe for Ka-band)
-    double min_radius_deg =
-        0.12; // stop when inside ~1/5 of typical 0.7 degrees beam
-    double arc_step_deg = 0.15; // constant arc length between points
-    double dwell_time_sec =
-        0.18; // time to wait at each point for RSSI to settle
-  };
+  using Config = CochlearScannerConfig;
 
-  explicit CochlearScanner(const Config &cfg = {}) : config(cfg) {}
+  // explicit CochlearScanner(const Config &cfg) : config(cfg) {}
+  // CochlearScanner() : CochlearScanner(Config{}) {}
+  CochlearScanner(const Config &cfg = Config()) : config(cfg) {}
 
   // Generate full spiral point list (az/el offsets from nominal pointing)
   std::vector<Point2D> generateScan() const {
