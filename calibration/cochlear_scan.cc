@@ -1,139 +1,85 @@
 #include <cmath>
-#include <functional>
-#include <iomanip>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
-// ------------------------------------------------------------------
-// Practical Cochlear (Constant Arc-Length Spiral) Scan for GEO Peaking
-// ------------------------------------------------------------------
-struct Point2D {
-  double az_offset_deg; // azimuth offset from nominal (degrees)
-  double el_offset_deg; // elevation offset from nominal (degrees)
+struct Point {
+  double x, y;
 };
 
-struct CochlearScannerConfig {
-  double start_radius_deg =
-      4.0; // initial search radius (±4 degrees is safe for Ka-band)
-  double min_radius_deg =
-      0.12; // stop when inside ~1/5 of typical 0.7 degrees beam
-  double arc_step_deg = 0.15;   // constant arc length between points
-  double dwell_time_sec = 0.18; // time to wait at each point for RSSI to settle
-};
-
-class CochlearScanner {
-public:
-  using Config = CochlearScannerConfig;
-
-  // explicit CochlearScanner(const Config &cfg) : config(cfg) {}
-  // CochlearScanner() : CochlearScanner(Config{}) {}
-  CochlearScanner(const Config &cfg = Config()) : config(cfg) {}
-
-  // Generate full spiral point list (az/el offsets from nominal pointing)
-  std::vector<Point2D> generateScan() const {
-    std::vector<Point2D> path;
-    path.reserve(1200); // typical for 4° → 0.12° spiral
-
-    double radius = config.start_radius_deg;
-    double theta = 0.0; // radians
-
-    while (radius > config.min_radius_deg) {
-      double az = radius * std::cos(theta);
-      double el = radius * std::sin(theta);
-
-      path.push_back({az, el});
-
-      // ---- Constant arc-length magic ----
-      double delta_theta =
-          config.arc_step_deg * (M_PI / 180.0) / radius; // rad per step
-      theta += delta_theta;
-
-      // Shrink radius by fixed arc length (converted to degrees)
-      radius -= config.arc_step_deg;
-
-      // Safety: prevent negative radius (should never happen)
-      if (radius < config.min_radius_deg)
-        radius = config.min_radius_deg;
-    }
-
-    // Add final center point (theoretical peak)
-    path.push_back({0.0, 0.0});
-    return path;
+/**
+ * Generates points along a cochlear-inspired logarithmic spiral where
+ * consecutive points are separated by an approximately constant arc length 's'.
+ *
+ * The spiral is defined as r(theta) = r_max * exp(-k * theta), spiraling
+ * inward. The parameter 'k' controls the tightness of the spiral and is
+ * computed based on the desired number of turns (e.g., human cochlea has ~2.5
+ * turns).
+ *
+ * Points are generated incrementally using the approximation delta_theta = s /
+ * r, which holds well for loosely wound spirals and matches the description
+ * where the angle between points increases as radius decreases.
+ *
+ * @param r_max Initial (maximum) radius.
+ * @param r_min Minimum radius to stop at.
+ * @param s Constant arc length between points.
+ * @param num_turns Number of spiral turns (e.g., 2.5 for cochlear mimic).
+ * @return Vector of points along the spiral.
+ */
+std::vector<Point> generate_cochlear_scan(double r_max, double r_min, double s,
+                                          double num_turns) {
+  std::vector<Point> points;
+  if (r_max <= r_min || s <= 0 || num_turns <= 0) {
+    std::cerr << "SOmeThinG is WrOnG." << std::endl;
+    return points; // Invalid parameters
   }
 
-  // Optional: stream points one by one with simulated RSSI feedback
-  void executeWithRssiFeedback(
-      const std::function<double(double az_offset, double el_offset)>
-          &rssiCallback,
-      double &best_az_offset, double &best_el_offset, double &best_rssi) const {
-    double radius = config.start_radius_deg;
-    double theta = 0.0;
+  // Compute k based on number of turns: theta_max = num_turns * 2 * PI
+  double theta_max = num_turns * 2.0 * M_PI;
+  // double k = std::log(r_max / r_min) / theta_max;
+  double a = (r_max - r_min) / theta_max;
 
-    best_rssi = -999.0;
+  double theta = 0.0;
+  double r = r_max;
 
-    while (radius > config.min_radius_deg) {
-      double az = radius * std::cos(theta);
-      double el = radius * std::sin(theta);
+  std::ofstream ofs;
+  ofs.open("cochlear.csv");
 
-      double current_rssi = rssiCallback(az, el);
+  std::cout << "R(" << r << "), Rmin(" << r_min << "), Rmax(" << r_max
+            << "), a(" << a << ")\n";
+  while (r > r_min) {
+    double x = r * std::cos(theta);
+    double y = r * std::sin(theta);
+    points.push_back({x, y});
 
-      if (current_rssi > best_rssi) {
-        best_rssi = current_rssi;
-        best_az_offset = az;
-        best_el_offset = el;
-      }
+    ofs << theta << "," << r << "\n";
+    // ofs << theta << "," << r << "," << x << "," << y << "\n";
+    // std::cout << theta << "," << r << "," << x << "," << y << "\n";
 
-      // Update spiral
-      double delta_theta = config.arc_step_deg * (M_PI / 180.0) / radius;
-      theta += delta_theta;
-      radius -= config.arc_step_deg;
-    }
+    // Approximate delta_theta for constant arc length s (ignoring radial
+    // component for simplicity)
+    double delta_theta = s / r;
 
-    // Final center check
-    double final_rssi = rssiCallback(0.0, 0.0);
-    if (final_rssi > best_rssi) {
-      best_rssi = final_rssi;
-      best_az_offset = 0.0;
-      best_el_offset = 0.0;
+    // Update theta and recompute r
+    theta += delta_theta;
+    // r = r_max * std::exp(-k * theta);
+    r = r_max - a * theta;
+
+    if (r < r_min) {
+      r = r_min;
     }
   }
 
-private:
-  Config config;
-};
+  return points;
+}
 
-// ------------------------------------------------------------------
-// Example usage with simulated Gaussian beam (for testing)
-// ------------------------------------------------------------------
+// Example usage (can be removed or commented out)
 int main() {
-  CochlearScanner scanner;
+  double r_max = 10.0;
+  double r_min = 0.1;
+  double s = 2.0;
+  double num_turns = 3.0;
 
-  std::cout << "Generating practical cochlear scan path...\n";
-  auto path = scanner.generateScan();
-
-  std::cout << "Total points: " << path.size() << "\n\n";
-  std::cout << std::fixed << std::setprecision(4);
-  for (size_t i = 0; i < path.size(); i += 25) { // print every 25th point
-    std::cout << "Point " << std::setw(4) << i
-              << " -> Az offset: " << std::setw(8) << path[i].az_offset_deg
-              << "°   El offset: " << std::setw(8) << path[i].el_offset_deg
-              << "°\n";
-  }
-
-  // Bonus: simulate peaking on a real beam (0.7° HPBW Gaussian)
-  auto simulatedRssi = [](double az_off_deg, double el_off_deg) -> double {
-    double distance = std::hypot(az_off_deg, el_off_deg);
-    double beamwidth_deg = 0.7;
-    return -12.0 * (distance / (beamwidth_deg / 1.665)) *
-           (distance / (beamwidth_deg / 1.665)); // approx dB
-  };
-
-  double best_az = 0, best_el = 0, best_rssi = -999;
-  scanner.executeWithRssiFeedback(simulatedRssi, best_az, best_el, best_rssi);
-
-  std::cout << "\nPeak found at: Az offset = " << best_az
-            << "°   El offset = " << best_el
-            << "°   with simulated RSSI = " << best_rssi << " dB\n";
-
+  auto points = generate_cochlear_scan(r_max, r_min, s, num_turns);
   return 0;
 }
